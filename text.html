@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>জাপানি ফ্ল্যাশকার্ড প্র্যাকটিস</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: rgba(30, 41, 59, 0.85);
+      --ink: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #8b5cf6;
+      --accent2: #22d3ee;
+      --answer: #fefce8;
+      --glow: rgba(139, 92, 246, 0.5);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      --transition: 0.6s ease-in-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--ink);
+      overflow: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 10% -10%, var(--accent) 0%, transparent 50%),
+                  radial-gradient(circle at 90% 110%, var(--accent2) 0%, transparent 60%);
+      opacity: 0.3;
+      z-index: -1;
+      animation: pulse 15s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.2; }
+      100% { opacity: 0.4; }
+    }
+
+    .app {
+      width: 90vw;
+      max-width: 1000px;
+      padding: 40px;
+      text-align: center;
+      border-radius: 25px;
+      backdrop-filter: blur(15px);
+      background: var(--card);
+      box-shadow: var(--glass-shadow);
+      position: relative;
+      z-index: 1;
+    }
+
+    .title {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 0 20px var(--accent), 0 0 30px var(--accent2);
+      animation: glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      0% { text-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent2); }
+      100% { text-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent2); }
+    }
+
+    .card {
+      position: relative;
+      padding: 50px;
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      margin: 20px auto;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      overflow: hidden;
+    }
+
+    .question,
+    .answer,
+    .pronunciation {
+      font-size: 2rem;
+      font-weight: 600;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity var(--transition), transform var(--transition);
+    }
+
+    .answer {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--answer);
+      text-shadow: 0 0 15px var(--glow);
+    }
+
+    .pronunciation {
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    .visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .timer-container {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .timer-container.visible {
+      opacity: 1;
+    }
+
+    .timer {
+      font-size: 1.2rem;
+      font-weight: bold;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+
+    .timer-circle {
+      transform: rotate(-90deg);
+      transform-origin: center;
+    }
+
+    .timer-circle circle {
+      fill: none;
+      stroke-width: 6;
+      stroke-dasharray: 188;
+      stroke-dashoffset: 188;
+      transition: stroke-dashoffset linear;
+    }
+
+    .progress {
+      height: 10px;
+      background: var(--muted);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 20px;
+      box-shadow: 0 0 10px var(--glow);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 0.5s ease;
+    }
+
+    .progress-timer {
+      font-size: 1rem;
+      color: var(--ink);
+      margin-left: 10px;
+      font-weight: 500;
+    }
+
+    .status {
+      margin-top: 15px;
+      font-size: 1.1rem;
+      color: var(--muted);
+      text-shadow: 0 0 5px var(--glow);
+    }
+
+    #particles {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: float 10s infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); opacity: 0.6; }
+      50% { opacity: 0.2; }
+      100% { transform: translateY(-100vh); opacity: 0; }
+    }
+
+    @media (max-width: 600px) {
+      .title { font-size: 1.8rem; }
+      .question, .answer { font-size: 1.6rem; }
+      .pronunciation { font-size: 1rem; }
+      .card { padding: 30px; min-height: 200px; }
+      .timer-container { width: 50px; height: 50px; }
+      .timer { font-size: 1rem; }
+      .progress-timer { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1 class="title">জাপানি ফ্ল্যাশকার্ড প্র্যাকটিস</h1>
+    <div class="card">
+      <div class="timer-container">
+        <svg class="timer-circle" width="60" height="60">
+          <circle cx="30" cy="30" r="27" />
+        </svg>
+        <div id="timer" class="timer">5</div>
+      </div>
+      <div id="q" class="question"></div>
+      <div id="a" class="answer"></div>
+      <div id="p" class="pronunciation"></div>
+    </div>
+    <div class="progress">
+      <div id="progress-bar" class="progress-bar"></div>
+      <div id="progress-timer" class="progress-timer">60:00</div>
+    </div>
+    <div id="status-text" class="status">প্রস্তুত...</div>
+  </div>
+  <canvas id="particles"></canvas>
+
+  <audio id="beep-sound" src="https://www.soundjay.com/button/button-3.mp3" preload="auto"></audio>
+  <audio id="result-sound" src="https://www.soundjay.com/misc/fanfare-1.mp3" preload="auto"></audio>
+
+  <script>
+    const DATA = [
+      { q: "“এখানে” জাপানিতে কী?", a: "ここ", p: "koko" },
+      { q: "“সেখানে (কাছে)” জাপানিতে কী?", a: "そこ", p: "soko" },
+      { q: "“ওখানে (দূরে)”", a: "あそこ", p: "asoko" },
+      { q: "“কোথায়?”", a: "どこ", p: "doko" },
+      { q: "‘শ্রেণীকক্ষ’", a: "きょうしつ", p: "kyoushitsu" },
+      { q: "‘খাবারঘর’", a: "しょくどう", p: "shokudou" },
+      { q: "‘অফিস’", a: "じむしょ", p: "jimusho" },
+      { q: "‘ডিপার্টমেন্টাল স্টোর’", a: "デパート", p: "depaato" },
+      { q: "‘বাংলাদেশ’", a: "バングラデシュ", p: "banguradeshu" }
+    ];
+
+    let currentIndex = -1;
+    let timerInterval;
+    let totalTime = 3600; // 1 hour in seconds
+    let wordTimerColors = ['#22d3ee', '#8b5cf6', '#f43f5e', '#10b981', '#f97316'];
+    const questionDuration = 5; // seconds
+
+    const qEl = document.getElementById('q');
+    const aEl = document.getElementById('a');
+    const pEl = document.getElementById('p');
+    const timerEl = document.getElementById('timer');
+    const timerContainer = document.querySelector('.timer-container');
+    const timerCircle = document.querySelector('.timer-circle circle');
+    const statusEl = document.getElementById('status-text');
+    const progressBar = document.getElementById('progress-bar');
+    const progressTimerEl = document.getElementById('progress-timer');
+    const beepSound = document.getElementById('beep-sound');
+    const resultSound = document.getElementById('result-sound');
+
+    function speak(text, callback) {
+      if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'ja-JP';
+        u.onend = callback;
+        speechSynthesis.speak(u);
+      } else {
+        callback();
+      }
+    }
+
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function startHourTimer() {
+      let timeLeft = totalTime;
+      progressTimerEl.textContent = formatTime(timeLeft);
+      const hourInterval = setInterval(() => {
+        timeLeft--;
+        progressTimerEl.textContent = formatTime(timeLeft);
+        progressBar.style.width = `${((totalTime - timeLeft) / totalTime) * 100}%`;
+        if (timeLeft <= 0) {
+          timeLeft = totalTime;
+          progressBar.style.width = '0%';
+        }
+      }, 1000);
+    }
+
+    function getRandomColor() {
+      return wordTimerColors[Math.floor(Math.random() * wordTimerColors.length)];
+    }
+
+    function nextCard() {
+      currentIndex = Math.floor(Math.random() * DATA.length);
+      const item = DATA[currentIndex];
+      qEl.textContent = item.q;
+      aEl.textContent = "";
+      pEl.textContent = "";
+      qEl.classList.add("visible");
+      aEl.classList.remove("visible");
+      pEl.classList.remove("visible");
+      timerEl.textContent = questionDuration;
+      statusEl.textContent = "প্রশ্ন চলছে...";
+      timerContainer.classList.add("visible");
+      timerCircle.style.stroke = getRandomColor();
+
+      let timeLeft = questionDuration;
+      timerCircle.style.strokeDashoffset = 188;
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = timeLeft;
+        timerCircle.style.strokeDashoffset = (188 * timeLeft) / questionDuration;
+        beepSound.play().catch(() => {});
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          timerContainer.classList.remove("visible");
+          showAnswer(item);
+        }
+      }, 1000);
+    }
+
+    function showAnswer(item) {
+      qEl.textContent = item.q; // Keep question visible
+      aEl.textContent = item.a;
+      pEl.textContent = item.p;
+      aEl.classList.add("visible");
+      pEl.classList.add("visible");
+      statusEl.textContent = "✔ উত্তর";
+      resultSound.play().catch(() => {});
+
+      speak(item.a, () => {
+        setTimeout(nextCard, 2000); // Wait 2 seconds after speech ends
+      });
+    }
+
+    // Particle Animation
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    function createParticle() {
+      const size = Math.random() * 5 + 2;
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: canvas.height,
+        size,
+        speed: Math.random() * 2 + 1
+      });
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.y -= p.speed;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(139, 92, 246, ${0.6 - p.y / canvas.height})`;
+        ctx.fill();
+        if (p.y < 0) particles.splice(i, 1);
+      }
+      if (particles.length < 50) createParticle();
+      requestAnimationFrame(animateParticles);
+    }
+
+    // Start the app
+    window.onload = () => {
+      startHourTimer();
+      nextCard();
+      animateParticles();
+    };
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
